@@ -1,0 +1,223 @@
+{
+  "map": [
+    {
+      "path": "map.tmx",
+      "teleport": [
+        {
+          "x": 24.0,
+          "y": 23.0,
+          "destination": "gym.tmx",
+          "dest_x": 12.0,
+          "dest_y": 13.0
+        },
+        {
+          "x": 16.0,
+          "y": 27.2,
+          "destination": "home.tmx",
+          "dest_x": 9.5,
+          "dest_y": 13.0
+        }
+      ],
+      "player": {
+        "x": 16,
+        "y": 30
+      },
+      "npcs": [],
+      "enemy_trainers": [
+        {
+          "x": 24.0,
+          "y": 29.0,
+          "classification": "stationary",
+          "facing": "DOWN",
+          "max_tiles": 2
+        },
+        {
+          "x": 54.0,
+          "y": 16.0,
+          "classification": "stationary",
+          "facing": "UP",
+          "max_tiles": 2
+        },
+        {
+          "x": 31.0,
+          "y": 31.0,
+          "classification": "stationary",
+          "facing": "UP",
+          "max_tiles": 2
+        }
+      ]
+    },
+    {
+      "path": "gym.tmx",
+      "teleport": [
+        {
+          "x": 11.0,
+          "y": 14.0,
+          "destination": "map.tmx",
+          "dest_x": 24.0,
+          "dest_y": 24.0
+        },
+        {
+          "x": 12.0,
+          "y": 14.0,
+          "destination": "map.tmx",
+          "dest_x": 24.0,
+          "dest_y": 24.0
+        },
+        {
+          "x": 13.0,
+          "y": 14.0,
+          "destination": "map.tmx",
+          "dest_x": 24.0,
+          "dest_y": 24.0
+        }
+      ],
+      "player": {
+        "x": 12,
+        "y": 12
+      },
+      "npcs": [],
+      "enemy_trainers": []
+    },
+    {
+      "path": "home.tmx",
+      "teleport": [
+        {
+          "x": 9.0,
+          "y": 14.0,
+          "destination": "map.tmx",
+          "dest_x": 16.0,
+          "dest_y": 28.5
+        },
+        {
+          "x": 10.0,
+          "y": 14.0,
+          "destination": "map.tmx",
+          "dest_x": 16.0,
+          "dest_y": 28.5
+        }
+      ],
+      "player": {
+        "x": 9.0,
+        "y": 13
+      },
+      "npcs": [
+        {
+          "type": "shop",
+          "x": 3,
+          "y": 1
+        }
+      ],
+      "enemy_trainers": []
+    }
+  ],
+  "current_map": "map.tmx",
+  "player": {
+    "x": 24.296875,
+    "y": 30.078125
+  },
+  "bag": {
+    "monsters": [
+      {
+        "name": "Cheetos",
+        "type": "Fire",
+        "hp": 28,
+        "max_hp": 28,
+        "level": 1,
+        "exp": 0,
+        "atk": 12,
+        "def": 6,
+        "sprite_path": "menu_sprites/menusprite7.png"
+      },
+      {
+        "name": "Bushyy",
+        "type": "Grass",
+        "hp": 34,
+        "max_hp": 34,
+        "level": 1,
+        "exp": 0,
+        "atk": 9,
+        "def": 9,
+        "sprite_path": "menu_sprites/menusprite1.png"
+      },
+      {
+        "name": "Seafish",
+        "type": "Water",
+        "hp": 42,
+        "max_hp": 42,
+        "level": 1,
+        "exp": 0,
+        "atk": 6,
+        "def": 12,
+        "sprite_path": "menu_sprites/menusprite12.png"
+      },
+      {
+        "name": "Capybara",
+        "type": "Normal",
+        "hp": 36,
+        "max_hp": 36,
+        "level": 1,
+        "exp": 0,
+        "atk": 14,
+        "def": 7,
+        "sprite_path": "menu_sprites/menusprite4.png"
+      },
+      {
+        "name": "Whideer",
+        "type": "Water",
+        "hp": 38,
+        "max_hp": 38,
+        "level": 1,
+        "exp": 0,
+        "atk": 8,
+        "def": 11,
+        "sprite_path": "menu_sprites/menusprite6.png"
+      },
+      {
+        "name": "Mossfly",
+        "type": "Grass",
+        "hp": 40,
+        "max_hp": 40,
+        "level": 1,
+        "exp": 0,
+        "atk": 10,
+        "def": 10,
+        "sprite_path": "menu_sprites/menusprite15.png"
+      }
+    ],
+    "items": [
+      {
+        "name": "Heal Potion",
+        "count": 5,
+        "sprite_path": "ingame_ui/heal.png",
+        "sell_price": 1
+      },
+      {
+        "name": "Strength Potion",
+        "count": 5,
+        "sprite_path": "ingame_ui/strength.png",
+        "sell_price": 1
+      },
+      {
+        "name": "Defense Potion",
+        "count": 5,
+        "sprite_path": "ingame_ui/defense.png",
+        "sell_price": 1
+      },
+      {
+        "name": "Pokeball",
+        "count": 9,
+        "sprite_path": "ingame_ui/ball.png",
+        "sell_price": 2
+      },
+      {
+        "name": "Coins",
+        "count": 66,
+        "sprite_path": "ingame_ui/coin.png"
+      }
+    ]
+  },
+  "pc_box": [],
+  "audio_volume": 0.23142857142857143,
+  "audio_muted": true
+}
