@@ -87,6 +87,7 @@ class Bag:
         dim = pg.Surface((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT), pg.SRCALPHA)
         dim.fill((0, 0, 0, 160))
         screen.blit(dim, (0, 0))
+        
 
         # Panel
         panel_width, panel_height = 550, 500
