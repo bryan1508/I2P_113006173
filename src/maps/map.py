@@ -60,6 +60,7 @@ class Map:
                         )
         return bushes
     
+    
     def check_bush(self, position):
         px, py = position.x+ GameSettings.TILE_SIZE // 2, position.y+ GameSettings.TILE_SIZE // 2
         for rect in self.bush_tiles:

@@ -43,9 +43,22 @@ class GameScene(Scene):
         self._last_chat_id_seen = 0      # last chat message ID seen
         self._chat_last_activity = time.monotonic()   # last time chat happened
         self._chat_visible = False                    # controls chatbox visibility
+        #nav
+        self.nav_overlay_open = False
+        self.nav_map_buttons: list[tuple[str, Button]] = []
+        self.nav_btn_normal = "UI/raw/UI_Flat_Button02a_3.png"
+        self.nav_btn_hover = "UI/raw/UI_Flat_Button02a_2.png"
+        self.nav_font = pg.font.Font(None, 28)
+        self.nav_small_font = pg.font.Font(None, 24)
 
         self.cooldown = 0
-    
+        #nav button 
+        self.nav_open_button = Button(
+            self.nav_btn_normal,
+            self.nav_btn_hover,
+            GameSettings.SCREEN_WIDTH - 210, 20, 50, 50,
+            self._toggle_nav_overlay
+            )
         #settings button
         self.settings_button = Button(
             "UI/button_setting.png",
@@ -129,7 +142,7 @@ class GameScene(Scene):
             self.slider_rect.left + int(self.volume * self.slider_rect.width),
             self.slider_rect.centery,
         )
-
+    
     def toggle_mute(self):
         GameSettings.AUDIO_MUTED = not GameSettings.AUDIO_MUTED
         self.muted = GameSettings.AUDIO_MUTED
@@ -162,9 +175,75 @@ class GameScene(Scene):
                 print("[WARN] No save file found.")
         except Exception as e:
             print(f"[ERROR] Failed to load game: {e}")
-    
-    
-        
+
+    def _toggle_nav_overlay(self):
+        if self.nav_overlay_open:
+            self._close_nav_overlay()
+        else:
+            self._open_nav_overlay()
+
+    def _open_nav_overlay(self):
+        self.nav_overlay_open = True
+        self._rebuild_nav_buttons()
+
+    def _close_nav_overlay(self):
+        self.nav_overlay_open = False
+        self.nav_map_buttons = []
+
+    def _on_click_map_destination(self, map_name: str):
+        self._close_nav_overlay()
+        if self.game_manager.player:
+            # compute BFS to teleport that leads to map_name
+            self.game_manager.player.start_navigation_to_map(map_name)
+
+    def _rebuild_nav_buttons(self):
+        # ONLY show destinations that current map can teleport to
+        cur_map = self.game_manager.current_map
+        if not cur_map:
+            self.nav_map_buttons = []
+            return
+
+        # get unique destination names from current map teleports
+        names = []
+        seen = set()
+        for tp in cur_map.teleporters:
+            dest = tp.destination
+            if dest == cur_map.path_name:
+                continue
+            if dest in seen:
+                continue
+            seen.add(dest)
+            names.append(dest)
+
+        # (optional) sort for stable order
+        names.sort()
+
+        panel_w, panel_h = 420, 360
+        panel_x = (GameSettings.SCREEN_WIDTH - panel_w) // 2
+        panel_y = (GameSettings.SCREEN_HEIGHT - panel_h) // 2
+
+        self.nav_map_buttons = []
+        btn_w, btn_h = 160, 46
+        gap = 14
+        cols = 2
+
+        start_x = panel_x + 40
+        start_y = panel_y + 90
+
+        for i, name in enumerate(names):
+            r = i // cols
+            c = i % cols
+            x = start_x + c * (btn_w + gap)
+            y = start_y + r * (btn_h + gap)
+
+            btn = Button(
+                self.nav_btn_normal,
+                self.nav_btn_hover,
+                x, y, btn_w, btn_h,
+                lambda n=name: self._on_click_map_destination(n)
+            )
+            self.nav_map_buttons.append((name, btn))
+
     @override
     def enter(self) -> None:
         sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
@@ -180,11 +259,28 @@ class GameScene(Scene):
         
     @override
     def update(self, dt: float):
+        #navigation
+        if not self.show_settings:
+            self.nav_open_button.update(dt)
+        if self.nav_overlay_open:
+            # ESC closes overlay
+            if input_manager.key_pressed(pg.K_ESCAPE):
+                self._close_nav_overlay()
+                return
+
+            # update buttons so hover/click works
+            for _, btn in self.nav_map_buttons:
+                btn.update(dt)
+
+            return
         
         #press b to open bag
         if(self.show_settings == False and self.game_manager.pc_box.visible == False and self.game_manager.current_shop_overlay == None and (not self.chat_overlay or not self.chat_overlay.is_open)):
             if input_manager.key_pressed(pg.K_b):
                     self.game_manager.bag.toggle()
+
+        
+        
         #press esc to open settings
         if(self.game_manager.bag.visible == False and self.game_manager.pc_box.visible == False and self.game_manager.current_shop_overlay == None and (not self.chat_overlay or not self.chat_overlay.is_open)):
             if input_manager.key_pressed(pg.K_ESCAPE):
@@ -406,6 +502,27 @@ class GameScene(Scene):
         #setting
         self.settings_button.draw(screen)
 
+        # NAV open button + text
+        self.nav_open_button.draw(screen)
+        nav_text = self.nav_small_font.render("NAV", True, (0, 0, 0))
+        is_hover = (self.nav_open_button.img_button is self.nav_open_button.img_button_hover)
+        if is_hover:
+            screen.blit(
+                nav_text,
+                (
+                    self.nav_open_button.hitbox.centerx - nav_text.get_width() // 2,
+                    self.nav_open_button.hitbox.centery + 4 - nav_text.get_height() // 2
+                )
+            )
+        else:
+            screen.blit(
+                nav_text,
+                (
+                    self.nav_open_button.hitbox.centerx - nav_text.get_width() // 2,
+                    self.nav_open_button.hitbox.centery - nav_text.get_height() // 2
+                )
+            )
+
         #shop
         if self.game_manager.current_shop_overlay:
             self.game_manager.current_shop_overlay.draw(screen)
@@ -491,6 +608,49 @@ class GameScene(Scene):
             # Back button
             self.back_button.draw(screen)
             self.x_button.draw(screen)
+
+        #navigation
+        if self.nav_overlay_open:
+            dim = pg.Surface((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT), pg.SRCALPHA)
+            dim.fill((0, 0, 0, 180))
+            screen.blit(dim, (0, 0))
+
+            panel_w, panel_h = 420, 360
+            panel_x = (GameSettings.SCREEN_WIDTH - panel_w) // 2
+            panel_y = (GameSettings.SCREEN_HEIGHT - panel_h) // 2
+            panel = pg.Rect(panel_x, panel_y, panel_w, panel_h)
+
+            pg.draw.rect(screen, (255, 165, 0), panel, border_radius=16)
+            pg.draw.rect(screen, (0, 0, 0), panel, 3, border_radius=16)
+
+            title = self.nav_font.render("Select Destination", True, (0, 0, 0))
+            screen.blit(title, (panel.centerx - title.get_width() // 2, panel.top + 26))
+
+            hint = self.nav_small_font.render("Click a map to auto-walk", True, (20, 20, 20))
+            screen.blit(hint, (panel.centerx - hint.get_width() // 2, panel.top + 56))
+
+            # draw map buttons + text labels
+            for name, btn in self.nav_map_buttons:
+                btn.draw(screen)
+                label = self.nav_small_font.render(name, True, (0, 0, 0))
+                is_hover = (btn.img_button is btn.img_button_hover)
+                if is_hover:
+                    screen.blit(
+                        label,
+                        (
+                            btn.hitbox.centerx - label.get_width() // 2,
+                            btn.hitbox.centery + 4 - label.get_height() // 2
+                        )
+                    )
+                else:
+                    screen.blit(
+                        label,
+                        (
+                            btn.hitbox.centerx - label.get_width() // 2,
+                            btn.hitbox.centery - label.get_height() // 2
+                        )
+                    )
+
 
 
     def _draw_chat_bubbles(self, screen: pg.Surface, camera: PositionCamera):
