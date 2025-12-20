@@ -231,11 +231,18 @@ class CatchScene(Scene):
         name = monster["name"]
         level = monster["level"]
 
-        if name not in EVOLUTIONS:
+        # If already evolved (e.g. "Bushyy+"), map back to base key ("Bushyy")
+        base_name = name.rstrip("+")  # removes one or more trailing '+'
+
+        if base_name not in EVOLUTIONS:
             return False
 
-        evo_data = EVOLUTIONS[name].get(level)
+        evo_data = EVOLUTIONS[base_name].get(level)
         if not evo_data:
+            return False
+
+        # Prevent re-applying the same evolution repeatedly
+        if monster["name"] == evo_data["name"]:
             return False
 
         # Apply evolution
@@ -249,6 +256,7 @@ class CatchScene(Scene):
         monster["hp"] = monster["max_hp"]
 
         return True
+
     
     def _attack(self):
         if self.waiting_for_click or self.battle_over:
